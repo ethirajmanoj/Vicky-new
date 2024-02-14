@@ -17,7 +17,9 @@ Sub ConnectToSharedMailboxAndSubfolder()
     ' Loop through items in the subfolder
     For Each olItem In olSubFolder.Items
         ' Process each item as needed
-        Debug.Print olItem.Subject ' Example: Print the subject of each email
+        'Debug.Print olItem.Subject ' Example: Print the subject of each email
+        ws.Cells(startRow, 1).Value = olItem.Subject
+        ws.Cells(startRow, 2).Value = olItem.ReceivedTime
     Next olItem
     ' Clean up objects
     Set olItem = Nothing
