@@ -1,47 +1,28 @@
-Sub ExtractSubjectFromFolder()
+Sub ConnectToSharedMailboxAndSubfolder()
     Dim olApp As Outlook.Application
-    Dim olNamespace As Outlook.Namespace
-    Dim olFolder As Outlook.MAPIFolder
-    Dim olItem As Object
-    Dim xlSheet As Worksheet
-    Dim rowNum As Integer
-
-    ' Define the Outlook folder path
-    Const folderPath As String = "Manoj.Ethiraj@flsmidth.com\Inbox\Bot Emails\PPM" ' Update with the path to your folder
-
-    ' Create a new Excel workbook and get the active sheet
-    Set xlSheet = ThisWorkbook.Sheets.Add
-    xlSheet.Name = "EmailSubjects"
-    xlSheet.Cells(1, 1).Value = "Subject"
-    xlSheet.Cells(1, 2).Value = "Date"
-    xlSheet.Cells(1, 3).Value = "Categories"
-    rowNum = 2
-
-    ' Initialize Outlook objects
+    Dim olNs As Outlook.Namespace
+    Dim olShareInbox As Outlook.Folder
+    Dim olSubFolder As Outlook.Folder
+    Dim olItem As Outlook.MailItem
+    ' Create Outlook application instance
     Set olApp = New Outlook.Application
-    Set olNamespace = olApp.GetNamespace("MAPI")
-    
-    ' Navigate through the folder hierarchy
-    Set olFolder = olNamespace.folders("Manoj.Ethiraj@flsmidth.com").folders("Inbox").folders("Bot Emails").folders("PPM") ' Update with the correct path to your folder
-
-    ' Loop through each email in the specified folder and extract subject
-    For Each olItem In olFolder.Items
-        If TypeName(olItem) = "MailItem" Then
-            xlSheet.Cells(rowNum, 1).Value = olItem.Subject
-            xlSheet.Cells(rowNum, 2).Value = olItem.ReceivedTime
-            xlSheet.Cells(rowNum, 3).Value = olItem.Categories
-            xlSheet.Cells(rowNum, 4).Value = olItem.Sender
-            'XL.(startRow, 2).Value = olItem.ReceivedTime
-            rowNum = rowNum + 1
-        End If
+    ' Get MAPI namespace
+    Set olNs = olApp.GetNamespace("MAPI")
+    ' Assuming you already have access to the shared mailbox, you can access its Inbox folder
+    ' Replace "SharedMailbox@domain.com" with the actual email address of the shared mailbox
+    Set olShareInbox = olNs.GetSharedDefaultFolder(olNs.CreateRecipient("SharedMailbox@domain.com"), olFolderInbox)
+    ' Assuming "SubfolderName" is the name of the subfolder you want to access within the shared mailbox
+    ' You can replace "SubfolderName" with the actual name of the subfolder
+    Set olSubFolder = olShareInbox.Folders("SubfolderName")
+    ' Loop through items in the subfolder
+    For Each olItem In olSubFolder.Items
+        ' Process each item as needed
+        Debug.Print olItem.Subject ' Example: Print the subject of each email
     Next olItem
-
-    ' Clean up
+    ' Clean up objects
     Set olItem = Nothing
-    Set olFolder = Nothing
-    Set olNamespace = Nothing
+    Set olSubFolder = Nothing
+    Set olShareInbox = Nothing
+    Set olNs = Nothing
     Set olApp = Nothing
-
-    MsgBox "Subject lines extracted successfully!", vbInformation
 End Sub
-
